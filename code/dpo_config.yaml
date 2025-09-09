@@ -1,0 +1,81 @@
+# DPO Training Configuration
+# Configuration file for DPO training with Qwen model
+
+# Data Configuration
+data:
+  processor_type: "anthropic_hh_rlhf"  # Name of data processor class to use
+  num_samples: 100000
+  log_samples: 3  # Number of sample examples to log for verification
+
+# Model Configuration  
+model:
+  name: "Qwen/Qwen2.5-0.5B-Instruct"
+  trust_remote_code: true
+  padding_side: "left"
+  torch_dtype: "float16"
+  
+# Quantization Configuration
+quantization:
+  load_in_4bit: true
+  bnb_4bit_quant_type: "nf4"
+  bnb_4bit_compute_dtype: "float16"
+  bnb_4bit_use_double_quant: true
+
+# LoRA (PEFT) Configuration
+lora:
+  r: 16
+  lora_alpha: 32
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+  lora_dropout: 0.1
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+# Training Configuration
+training:
+  output_dir: "/opt/ml/checkpoints"  # For checkpoints during training
+  final_model_dir: "/opt/ml/model"    # For final model - auto-uploaded to S3
+  num_train_epochs: 1
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 4
+  gradient_checkpointing: true
+  learning_rate: 5.0e-5
+  lr_scheduler_type: "cosine"
+  warmup_steps: 100
+  logging_steps: 10
+  save_steps: 100
+  save_total_limit: 2
+  remove_unused_columns: false
+  push_to_hub: false
+  report_to: "none"
+  dataloader_num_workers: 2
+  ddp_find_unused_parameters: false
+
+# DPO Specific Configuration
+dpo:
+  beta: 0.1  # DPO temperature parameter
+  loss_type: "sigmoid"  # DPO loss type
+  max_length: 512
+  max_prompt_length: 256
+
+# GPU Configuration
+gpu:
+  visible_devices: "0,1,2,3"  # GPU IDs to use
+  tokenizers_parallelism: false
+
+# Test Generation Configuration
+test:
+  prompt: "What is AI?"
+  max_new_tokens: 10
+  do_sample: false  # Use greedy decoding for stability
+  temperature: 1.0  # Not used with greedy, but safe default
+  use_cache: false
+
+# Random Seeds
+seeds:
+  torch: 42
+  python: 42
+
+# Logging
+logging:
+  level: "INFO"

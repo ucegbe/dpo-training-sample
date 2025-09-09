@@ -1,0 +1,16 @@
+
+# DPO and PEFT
+trl==0.22.2
+peft==0.17.1
+bitsandbytes==0.47.0
+transformers==4.55.2
+
+# General utilities
+numpy
+pandas
+pyyaml
+tqdm
+rich
+
+# For distributed training
+deepspeed
